@@ -6,7 +6,7 @@ sys.path.append(os.pardir)
 import pytest
 import sympy as sp
 
-import numaly.chapter5 as ch5
+import numana.chapter5 as ch5
 
 class TestNewtonCotes(object):
     def setup(self):

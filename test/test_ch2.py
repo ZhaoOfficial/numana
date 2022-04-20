@@ -7,7 +7,7 @@ import numpy as np
 import pytest
 import sympy as sp
 
-import numaly.chapter2 as ch2
+import numana.chapter2 as ch2
 
 class TestGaussJordan(object):
     def output_gauss_jordan(self, A: np.ndarray, b: np.ndarray):

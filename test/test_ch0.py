@@ -8,7 +8,7 @@ import numpy as np
 import pytest
 import sympy as sp
 
-import numaly.chapter0 as ch0
+import numana.chapter0 as ch0
 
 class TestNest(object):
     def output_nest(self,
