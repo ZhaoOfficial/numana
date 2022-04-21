@@ -24,7 +24,10 @@ class NewtonCotes(object):
             self._secondOrder(a, b),
             self._thirdOrder(a, b),
             self._forthOrder(a, b),
-            sp.integrate(self.symbol_f, (self.x, a, b))
+            self._fifthOrder(a, b),
+            self._sixthOrder(a, b),
+            self._seventhOrder(a, b),
+            sp.integrate(self.symbol_f, (self.x, a, b)),
         )
 
     def _firstOrder(self, a: float, b: float) -> float:
@@ -56,6 +59,39 @@ class NewtonCotes(object):
         y3 = self.numeric_f(b - h)
         y4 = self.numeric_f(b)
         return h * (7.0 * (y0 + y4) + 32.0 * (y1 + y3) + 12.0 * y2) * 2.0 / 45.0
+
+    def _fifthOrder(self, a: float, b: float) -> float:
+        h = (b - a) / 5.0
+        y0 = self.numeric_f(a)
+        y1 = self.numeric_f(a + h)
+        y2 = self.numeric_f(a + 2.0 * h)
+        y3 = self.numeric_f(b - 2.0 * h)
+        y4 = self.numeric_f(b - h)
+        y5 = self.numeric_f(b)
+        return h * (19.0 * (y0 + y5) + 75.0 * (y1 + y4) + 50.0 * (y2 + y3)) * 5.0 / 288.0
+
+    def _sixthOrder(self, a: float, b: float) -> float:
+        h = (b - a) / 6.0
+        y0 = self.numeric_f(a)
+        y1 = self.numeric_f(a + h)
+        y2 = self.numeric_f(a + 2.0 * h)
+        y3 = self.numeric_f(a + 3.0 * h)
+        y4 = self.numeric_f(b - 2.0 * h)
+        y5 = self.numeric_f(b - h)
+        y6 = self.numeric_f(b)
+        return h * (41.0 * (y0 + y6) + 216.0 * (y1 + y5) + 27.0 * (y2 + y4) + 272.0 * y3) / 140.0
+
+    def _seventhOrder(self, a: float, b: float) -> float:
+        h = (b - a) / 7.0
+        y0 = self.numeric_f(a)
+        y1 = self.numeric_f(a + h)
+        y2 = self.numeric_f(a + 2.0 * h)
+        y3 = self.numeric_f(a + 3.0 * h)
+        y4 = self.numeric_f(b - 3.0 * h)
+        y5 = self.numeric_f(b - 2.0 * h)
+        y6 = self.numeric_f(b - h)
+        y7 = self.numeric_f(b)
+        return h * (751.0 * (y0 + y7) + 3577.0 * (y1 + y6) + 1323.0 * (y2 + y5) + 2989.0 * (y3 + y4)) * 7.0 / 17280.0
 
 class CompositeNewtonCotes(object):
     """

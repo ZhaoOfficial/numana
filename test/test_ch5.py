@@ -13,15 +13,14 @@ class TestNewtonCotes(object):
         self.x = sp.Symbol('x')
 
     def output_newton_cotes(self, f: sp.Function, a: float, b: float):
+        """Here we find that the integration method the sympy use is the fifth order Newton-Cotes formula."""
         nc = ch5.NewtonCotes(f)
         result = nc(a, b)
         print("The function is \033\13331mf(x) = {}\033\1330m and the interval is \033\13331m[{}, {}]\033\1330m".format(nc.symbol_f, a, b))
-        print("Using \033\13331m1\033\1330m order Newton-Cotes formula, the result is: \033\13334m[{}]\033\1330m".format(result[0]))
-        print("Using \033\13331m2\033\1330m order Newton-Cotes formula, the result is: \033\13334m[{}]\033\1330m".format(result[1]))
-        print("Using \033\13331m3\033\1330m order Newton-Cotes formula, the result is: \033\13334m[{}]\033\1330m".format(result[2]))
-        print("Using \033\13331m4\033\1330m order Newton-Cotes formula, the result is: \033\13334m[{}]\033\1330m".format(result[3]))
-        print("Using symbolic integration, the result is: \033\13334m[{}]\033\1330m".format(result[4]))
-
+        for i in range(7):
+            print("Using \033\13331m{0}\033\1330m order Newton-Cotes formula, the result is: \033\13334m[{1}]\033\1330m".format(i + 1, result[i]))
+        print("Using symbolic integration formula, the result is: \033\13334m[{}]\033\1330m".format(result[4]))
+  
     def test_newton_cotes(self):
         self.output_newton_cotes(sp.log(self.x), 1.0, 2.0)
         self.output_newton_cotes(self.x ** 2,    0.0, 1.0)

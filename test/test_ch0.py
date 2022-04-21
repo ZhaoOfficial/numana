@@ -11,22 +11,25 @@ import sympy as sp
 import numana.chapter0 as ch0
 
 class TestNest(object):
+    def setup(self):
+        self.x = sp.Symbol('x')
+
     def output_nest(self,
         x: Union[float, Iterable],
         coefficients: Iterable,
         base_points: Optional[Iterable] = None
     ):
-        y = ch0.nest(x, coefficients, base_points)
-
-        xx, yy = sp.Symbol('x'), sp.Symbol(str(coefficients[-1]))
         coeffs = np.asarray(coefficients[-2::-1])
         if base_points is None:
             base_points = np.zeros_like(coeffs)
         else:
             base_points = np.asarray(base_points)
 
+        y = ch0.nest(x, coefficients, base_points)
+        yy = sp.Symbol(str(coefficients[-1]))
+
         for i in range(coeffs.shape[0]):
-            yy = yy * (xx + base_points[i]) + coeffs[i]
+            yy = yy * (self.x + base_points[i]) + coeffs[i]
         yy = sp.expand(yy, mul=True)
         print("Evaluating \033\13331m[{}]\033\1330m at x = {}, the value is \033\13334m[{}]\033\1330m.".format(yy, x, y))
         
@@ -59,10 +62,12 @@ class TestNest(object):
         print("\033\13334m[{}]\033\1330m.".format((1 - 1.00001) * ch0.nest(1.00001 ** 2, np.ones(50, dtype=int))))
 
 class TestSignificance(object):
+    def setup(self):
+        self.x = sp.Symbol('x')
+
     def output_quadratic(self, a: float, b: float, c: float):
-        x = sp.Symbol('x')
         solution = ch0.quadratic(a, b, c)
-        print("Solving \033\13331m[{}]\033\1330m in real number, the solution is \033\13334m{}\033\1330m.".format(a * x ** 2 + b * x + c, solution))
+        print("Solving \033\13331m[{}]\033\1330m in real number, the solution is \033\13334m{}\033\1330m.".format(a * self.x ** 2 + b * self.x + c, solution))
 
     def test_quadratic(self):
         self.output_quadratic(1, -3, 2)
