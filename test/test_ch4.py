@@ -38,6 +38,10 @@ class TestLeastSquare(object):
         b = np.array([[-1], [3], [2]])
         self.output_least_square(A, b)
 
+        A = np.stack([np.ones(400), np.linspace(-2.0 * np.pi, 2.0 * np.pi, 400)], axis=-1)
+        b = np.sin(np.linspace(-2.0 * np.pi, 2.0 * np.pi, 400).reshape(-1, 1))
+        self.output_least_square(A, b)
+
 
 if __name__ == "__main__":
     pytest.main(["-s", "test_ch4.py::TestLeastSquare::test_least_square"])
