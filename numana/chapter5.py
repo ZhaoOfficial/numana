@@ -14,7 +14,7 @@ class NewtonCotes(object):
         self.symbol_f = f
         self.numeric_f = sp.lambdify(self.x, f, "numpy")
 
-    def __call__(self, a: float, b: float) -> Tuple[float]:
+    def __call__(self, a: float, b: float) -> Tuple[float, float, float, float, float, float, float, float]:
         """Integration on `[a, b]`."""
 
         assert not (math.isinf(a) or math.isnan(a)), "Invalid interval."
@@ -108,7 +108,7 @@ class CompositeNewtonCotes(object):
         self.symbol_f = f
         self.numeric_f = sp.lambdify(self.x, f, "numpy")
 
-    def __call__(self, a: float, b: float, m: int) -> Tuple[float]:
+    def __call__(self, a: float, b: float, m: int) -> Tuple[float, float, float, float]:
         """Divide `[a, b]` into `m` segments."""
 
         assert not (math.isinf(a) or math.isnan(a)), "Invalid interval."
@@ -154,7 +154,7 @@ class Romberg(object):
         self.symbol_f = f
         self.numeric_f = sp.lambdify(self.x, f, "numpy")
 
-    def __call__(self, a: float, b: float, m: int) -> Tuple[float]:
+    def __call__(self, a: float, b: float, m: int) -> Tuple[float, float]:
         """Romberg integration on `[a, b]` with `m` lines of romberg table."""
 
         assert not (math.isinf(a) or math.isnan(a)), "Invalid interval."
@@ -172,3 +172,46 @@ class Romberg(object):
             h /= 2.0
 
         return (R[-1, -1], sp.integrate(self.symbol_f, (self.x, a, b)))
+
+class GaussLegendre(object):
+    """
+    Gauss-Legendre methods for numerical integration.
+    @param `f`: the function to evaluate on some intervals.
+    """
+
+    ROOT = (
+        (-math.sqrt(3.0) / 3.0, math.sqrt(3.0) / 3.0),
+        (-math.sqrt(15.0) / 5.0, 0.0, math.sqrt(15.0) / 5.0),
+        (-math.sqrt(525.0 + 70.0 * math.sqrt(30.0)) / 35.0, -math.sqrt(525.0 - 70.0 * math.sqrt(30.0)) / 35.0, math.sqrt(525.0 - 70.0 * math.sqrt(30.0)) / 35.0, math.sqrt(525.0 + 70.0 * math.sqrt(30.0)) / 35.0)
+    )
+
+    COEFFICIENT = (
+        (1.0, 1.0),
+        (5.0 / 9.0, 8.0 / 9.0, 5.0 / 9.0),
+        (0.5 - math.sqrt(30.0) / 36.0, 0.5 + math.sqrt(30.0) / 36.0, 0.5 + math.sqrt(30.0) / 36.0, 0.5 - math.sqrt(30.0) / 36.0)
+    )
+
+    def __init__(self, f: sp.Function):
+        self.x = sp.Symbol('x')
+        self.symbol_f = f
+        self.numeric_f = sp.lambdify(self.x, f, "numpy")
+
+    def __call__(self, a: float, b: float) -> Tuple[float, float, float, float]:
+        """Integration on `[a, b]`."""
+
+        assert not (math.isinf(a) or math.isnan(a)), "Invalid interval."
+        assert not (math.isinf(b) or math.isnan(b)), "Invalid interval."
+
+        return (
+            self._solver(a, b, 0),
+            self._solver(a, b, 1),
+            self._solver(a, b, 2),
+            sp.integrate(self.symbol_f, (self.x, a, b)),
+        )
+
+    def _solver(self, a: float, b: float, order: int) -> float:
+        result = 0.0
+        for r, c in zip(self.ROOT[order], self.COEFFICIENT[order]):
+            root = 0.5 * ((b - a) * r + b + a)
+            result += c * self.numeric_f(root) * (b - a) * 0.5
+        return result

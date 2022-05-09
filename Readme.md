@@ -14,11 +14,11 @@ Code for Numerical Analysis.
 
 ### Chapter 1 Solving Equations
 
-- [ ] 1.1 The Bisection Method
-- [ ] 1.2 Fixed-Point Iteration
-- [ ] 1.3 Limits of Accuracy
-- [ ] 1.4 Newton’s Method
-- [ ] 1.5 Root-Finding without Derivatives
+- [x] 1.1 The Bisection Method
+- [x] 1.2 Fixed-Point Iteration
+- [x] 1.3 Limits of Accuracy
+- [x] 1.4 Newton’s Method
+- [x] 1.5 Root-Finding without Derivatives
 
 ### Chapter 2 Systems of Equations
 
@@ -40,7 +40,7 @@ Code for Numerical Analysis.
 
 ### Chapter 4 Least Squares
 
-- [ ] 4.1 Least Squares and the Normal Equations
+- [x] 4.1 Least Squares and the Normal Equations
 - [ ] 4.2 A Survey of Models
 - [ ] 4.3 QR Factorization
 - [ ] 4.4 Generalized Minimum Residual (GMRES) Method
@@ -49,10 +49,10 @@ Code for Numerical Analysis.
 ### Chapter 5 Numerical Differentiation and Integration
 
 - [ ] 5.1 Numerical Differentiation
-- [ ] 5.2 Newton–Cotes Formulas for Numerical Integration
-- [ ] 5.3 Romberg Integration
+- [x] 5.2 Newton–Cotes Formulas for Numerical Integration
+- [x] 5.3 Romberg Integration
 - [ ] 5.4 Adaptive Quadrature
-- [ ] 5.5 Gaussian Quadrature
+- [x] 5.5 Gaussian Quadrature
 
 ### Chapter 6 Ordinary Differential Equations
 
