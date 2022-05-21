@@ -14,7 +14,7 @@ class TestGaussJordan(object):
         x = sp.Matrix(ch2.GaussJordan(A).solve(b))
         A = sp.Matrix(A)
         b = sp.Matrix(b)
-        print("Solved \033\13331m{}\033\1330m\n\033\13334m{}\033\1330m\n\033\13331m{}\033\1330m".format(repr(A), repr(x), repr(b)))
+        print("Solved \033\13331m{}\033\1330m\n\033\13334m{}\033\1330m\n\033\13331m{}\033\1330m.".format(repr(A), repr(x), repr(b)))
 
     def testGaussJordan(self):
         A = np.array([
@@ -112,7 +112,7 @@ class TestLU(object):
         A = sp.Matrix(A)
         L = sp.Matrix(lu.L)
         U = sp.Matrix(lu.U)
-        print("Solved \033\13331m{}\033\1330m\n\033\13334m{}\n{}\033\1330m".format(repr(A), repr(L), repr(U)))
+        print("Solved \033\13331m{}\033\1330m\n\033\13334m{}\n{}\033\1330m.".format(repr(A), repr(L), repr(U)))
 
     def outputLUSolve(self, A: np.ndarray, b: np.ndarray):
         lu = ch2.LU(A)
@@ -120,7 +120,7 @@ class TestLU(object):
         L = sp.Matrix(lu.L)
         U = sp.Matrix(lu.U)
         b = sp.Matrix(b)
-        print("Solved \033\13331m{}\n{}\033\1330m\n\033\13334m{}\033\1330m\n\033\13331m{}\033\1330m".format(repr(L), repr(U), repr(x), repr(b)))
+        print("Solved \033\13331m{}\n{}\033\1330m\n\033\13334m{}\033\1330m\n\033\13331m{}\033\1330m.".format(repr(L), repr(U), repr(x), repr(b)))
 
     def test_lu(self):
         A = np.array([
@@ -198,7 +198,7 @@ class TestCholesky(object):
         c = ch2.Cholesky(A)
         A = sp.Matrix(A)
         R = sp.Matrix(c.R)
-        print("Solved \033\13331m{}\033\1330m\n\033\13334m{}\033\1330m".format(repr(A), repr(R)))
+        print("Solved \033\13331m{}\033\1330m\n\033\13334m{}\033\1330m.".format(repr(A), repr(R)))
 
     def testCholesky(self):
         self.A = np.array([
