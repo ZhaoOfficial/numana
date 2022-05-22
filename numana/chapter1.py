@@ -1,4 +1,3 @@
-from typing import Tuple
 import sys
 
 import numpy as np
@@ -16,14 +15,13 @@ class Solver(object):
         return sp.solve(self.symbol_f, sympy.abc.x)
 
     def bisection(self, a: float, b: float) -> float:
-        """Using bisection method to find a root of funtion `f` in the interval `[a, b]`."""
+        """
+        Using bisection method to find a root of funtion `f` in the interval `[a, b]`.
+        Left endpoint is the anchor.
+        """
         a, b = np.asarray(a), np.asarray(b)
-        self.__checkEndpoint(a, b)
-        return self._bisectionCore(a, b)
-
-    def _bisectionCore(self, a: float, b: float) -> float:
-        """Left endpoint is the anchor."""
-        fa = self.numeric_f(a)
+        fa, fb = self.numeric_f(a), self.numeric_f(b)
+        assert fa * fb < 0, "[{}, {}] is not a proper interval".format(a, b)
         tolerance = 2.0 * self.epsilon * max(1, abs(a))
 
         while abs(b - a) > tolerance:
@@ -51,13 +49,20 @@ class Solver(object):
 
         return b
 
+    def newton(self, a: float) -> float:
+        """Using Newton-Raffson's method to find the root of `f`."""
+        a, b = np.asarray(a), np.asarray(a)
+        tolerance = 2.0 * self.epsilon * max(1.0, abs(a))
+        df = sp.lambdify(sympy.abc.x, sp.diff(self.symbol_f), "numpy")
+
+        a, b = b, b - self.numeric_f(b) / df(b)
+        while abs(b - a) > tolerance:
+            a, b = b, b - self.numeric_f(b) / df(b)
+        return a
+
     def secant(self, a: float, b: float) -> float:
         """Secant method (an improvement of Newton's method) for finding a root near `a` and `b`."""
         a, b = np.asarray(a), np.asarray(b)
-        self.checkEndpoint(a, b)
-        return self.__checkEndpoint(a, b)
-
-    def _secantCore(self, a: float, b: float) -> float:
         fa, fb = self.numeric_f(a), self.numeric_f(b)
         tolerance = 2.0 * self.epsilon * max(1.0, abs(a))
 
@@ -67,6 +72,39 @@ class Solver(object):
             fa, fb = fb, self.numeric_f(c)
         return b
 
-    def __checkEndpoint(self, a: float, b: float) -> None:
+    def regulaFalsi(self, a: float, b: float) -> float:
+        """A combination of bisection and secant method."""
+        a, b = np.asarray(a), np.asarray(b)
         fa, fb = self.numeric_f(a), self.numeric_f(b)
-        assert fa * fb < 0, "[{}, {}] is not a proper interval".format(a, b)
+        tolerance = 2.0 * self.epsilon * max(1.0, abs(a))
+
+        while abs(b - a) > tolerance:
+            c = b - (fb * (b - a)) / (fb - fa)
+            fc = self.numeric_f(c)
+            if fc == 0.0:
+                return c
+            if fa * fc < 0.0:
+                b, fb = c, fc
+            else:
+                a, fa = c, fc
+        return b if abs(fb) < abs(self.numeric_f((a + b) / 2.0)) else (a + b) / 2.0
+
+    def inverseInterpolation(self, a: float, b: float, c: float) -> float:
+        """Inverse quadratic interpolation method for solving equations."""
+        a, b, c = np.asarray(a), np.asarray(b), np.asarray(c)
+        fa, fb, fc = self.numeric_f(a), self.numeric_f(b), self.numeric_f(c)
+        tolerance = 2.0 * self.epsilon * max(1.0, abs(a))
+
+        while abs(b - c) > tolerance:
+            AB = fa / fb
+            AC = fa / fc
+            BA = fb / fa
+            BC = fb / fc
+            CA = fc / fa
+            CB = fc / fb
+
+            d = -(a * (BA - CA) + b * (CB - AB) + c * (AC - BC)) / ((AB - 1) * (BC - 1) * (CA - 1))
+            a, b, c = b, c, d
+            fa, fb, fc = fb, fc, self.numeric_f(d)
+
+        return c

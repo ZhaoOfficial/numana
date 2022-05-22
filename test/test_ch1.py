@@ -1,7 +1,5 @@
-import math
 import os
 import sys
-from typing import Iterable, Optional, Union
 sys.path.append(os.pardir)
 
 import numpy as np
@@ -85,6 +83,38 @@ class TestFixedPointIteration(object):
         # (7)
         self.outputFixedPointIteration(1 - 5 * x + 15 / 2 * x ** 2 - 5 / 2 * x ** 3, 2.18)
 
+class TestNewton(object):
+    def outputNewton(self, f: sp.Function, a: float) -> None:
+        solver = ch1.Solver(f)
+        result = solver.newton(a)
+        print("The function is \033\13331mf(x) = {}\033\1330m and the initial value is \033\13331m[{}]\033\1330m.".format(f, a))
+        print("The result is: \033\13334m[{}]\033\1330m.".format(result))
+
+    def testNewton(self):
+        x = sp.Symbol('x')
+        # (1)
+        self.outputNewton(x ** 3 + x - 2, 0.0)
+        self.outputNewton(x ** 4 - x ** 2 + x - 1, 0.0)
+        self.outputNewton(x ** 2 - x - 1, 0.0)
+        # (2)
+        self.outputNewton(x ** 3 + x ** 2 - 1, 1.0)
+        self.outputNewton(x ** 2 + 1 / (x + 1) - 3 * x, 1.0)
+        self.outputNewton(5 * x - 10, 1.0)
+        # (12) inf
+        # self.outputNewton(1 / x, 1.0)
+        # (13)
+        self.outputNewton(x ** 3 - 4 * x, 0.5)
+        # (1)
+        self.outputNewton(x ** 3 - 2 * x - 2, 1.0)
+        self.outputNewton(sp.exp(x) + x - 7, 1.0)
+        self.outputNewton(sp.exp(x) + sp.sin(x) - 4, 1.0)
+        # (2)
+        self.outputNewton(x ** 5 + x - 1, 1.0)
+        self.outputNewton(sp.sin(x) - 6 * x - 5, 1.0)
+        self.outputNewton(sp.log(x) + x ** 2 - 3, 1.0)
+        # (3)
+        self.outputNewton(27 * x ** 3 + 54 * x ** 2 + 36 * x + 8, -1.0)
+
 class TestSecant(object):
     def outputSecant(self, f: sp.Function, a: float, b: float) -> None:
         solver = ch1.Solver(f)
@@ -99,7 +129,36 @@ class TestSecant(object):
         self.outputSecant(sp.exp(x) + x - 7, 1.0, 2.0)
         self.outputSecant(sp.exp(x) + sp.sin(x) - 4, 1.0, 2.0)
 
+class TestRegulaFalsi(object):
+    def outputRegulaFalsi(self,f : sp.Function, a: float, b: float) -> None:
+        solver = ch1.Solver(f)
+        result = solver.regulaFalsi(a, b)
+        print("The function is \033\13331mf(x) = {}\033\1330m and the interval is \033\13331m[{}, {}]\033\1330m.".format(f, a, b))
+        print("The result is: \033\13334m[{}]\033\1330m.".format(result))
+
+    def testRegulaFalsi(self) -> None:
+        x = sp.Symbol('x')
+        self.outputRegulaFalsi(x ** 3 - 2 * x - 2, 1.0, 2.0)
+        self.outputRegulaFalsi(sp.exp(x) + x - 7, 1.0, 2.0)
+        self.outputRegulaFalsi(sp.exp(x) + sp.sin(x) - 4, 1.0, 2.0)
+
+class TestInverseInterpolation(object):
+    def outputInverseInterpolation(self, f: sp.Function, a: float, b: float, c: float) -> None:
+        solver = ch1.Solver(f)
+        result = solver.inverseInterpolation(a, b, c)
+        print("The function is \033\13331mf(x) = {}\033\1330m and the initials are \033\13331m[{}, {}, {}]\033\1330m.".format(f, a, b, c))
+        print("The result is: \033\13334m[{}]\033\1330m.".format(result))
+
+    def testInverseInterpolation(self) -> None:
+        x = sp.Symbol('x')
+        self.outputInverseInterpolation(x ** 3 - 2 * x - 2, 1.0, 2.0, 0.0)
+        self.outputInverseInterpolation(sp.exp(x) + x - 7, 1.0, 2.0, 0.0)
+        self.outputInverseInterpolation(sp.exp(x) + sp.sin(x) - 4, 1.0, 2.0, 0.0)
+
 if __name__ == "__main__":
-    # pytest.main(["-s", "test_ch1.py::TestBisection::testBisection"])
+    pytest.main(["-s", "test_ch1.py::TestBisection::testBisection"])
     pytest.main(["-s", "test_ch1.py::TestFixedPointIteration::testFixedPointIteration"])
-    # pytest.main(["-s", "test_ch1.py::TestSecant::testSecant"])
+    pytest.main(["-s", "test_ch1.py::TestNewton::testNewton"])
+    pytest.main(["-s", "test_ch1.py::TestSecant::testSecant"])
+    pytest.main(["-s", "test_ch1.py::TestRegulaFalsi::testRegulaFalsi"])
+    pytest.main(["-s", "test_ch1.py::TestInverseInterpolation::testInverseInterpolation"])
