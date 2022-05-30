@@ -128,7 +128,6 @@ class ImplicitEulerSystem(SystemSolver):
             y_i_j_next = [y_i[j] + f_i(*y_i_j_prev) * step_size for y_i, f_i in zip(ys, self.f)]
 
             for _ in range(self.num_iter):
-                y_i_j = [y_i[j + 1] for y_i in ys]
                 y_i_j_prev = y_i_j_next
                 y_i_j_next = [y_i[j] + f_i(*y_i_j_prev) * step_size for y_i, f_i in zip(ys, self.f)]
                 if np.allclose(y_i_j_prev, y_i_j_next):
@@ -154,25 +153,60 @@ class TrapezoidEulerSystem(SystemSolver):
             y[0] = init
             ys.append(y)
 
-        #* y_{i, j + 1} = y_{i, j} + h * [f_{i}(y_{1, j}, y_{2, j}, ...) + f_{i}(y_{1, j + 1}, y_{2, j + 1}, ...)]
+        #* y_{i, j + 1} = y_{i, j} + h * 0.5 * [f_{i}(y_{1, j}, y_{2, j}, ...) + f_{i}(y_{1, j + 1}, y_{2, j + 1}, ...)]
         for j in range(xs.shape[0] - 1):
             #* using explicit Euler's method for initial value
             y_i_j = [y_i[j] for y_i in ys]
             y_i_j_prev = [y_i[j] + f_i(*y_i_j) * step_size for y_i, f_i in zip(ys, self.f)]
-            y_i_j_next = [y_i[j] + (f_i(*y_i_j_prev) + f_i(*y_i_j)) * step_size * 0.5 for y_i, f_i in zip(ys, self.f)]
+            y_i_j_next = [y_i[j] + f_i(*y_i_j_prev) * step_size for y_i, f_i in zip(ys, self.f)]
 
             for _ in range(self.num_iter):
-                y_i_j = [y_i[j + 1] for y_i in ys]
                 y_i_j_prev = y_i_j_next
-                y_i_j_next = [y_i[j] + (f_i(*y_i_j_prev) + f_i(*y_i_j)) * step_size * 0.5 for y_i, f_i in zip(ys, self.f)]
+                y_i_j_next = [y_i[j] + f_i(*y_i_j_prev) * step_size for y_i, f_i in zip(ys, self.f)]
                 if np.allclose(y_i_j_prev, y_i_j_next):
                     break
+
+            y_i_j = [y_i[j] for y_i in ys]
+            f_y_i_j = [f_i(*y_i_j) for f_i in self.f]
+            f_y_i_j1 = [f_i(*y_i_j_next) for f_i in self.f]
+            for y_i, a, b in zip(ys, f_y_i_j, f_y_i_j1):
+                y_i[j + 1] = y_i[j] + (a + b) * step_size * 0.5
+
+        return ys
+
+class RungeKuttaSystem(SystemSolver):
+    def rk4(self, step_size: float, y_i_j: Sequence[float]) -> float:
+        K1 = [f_i(*y_i_j) for f_i in self.f]
+        y1 = [y_j + k1_j * step_size * 0.5 for y_j, k1_j in zip(y_i_j, K1)]
+
+        K2 = [f_i(*y1) for f_i in self.f]
+        y2 = [y_j + k2_j * step_size * 0.5 for y_j, k2_j in zip(y_i_j, K2)]
+
+        K3 = [f_i(*y2) for f_i in self.f]
+        y3 = [y_j + k2_j * step_size for y_j, k2_j in zip(y_i_j, K3)]
+
+        K4 = [f_i(*y3) for f_i in self.f]
+
+        y_i_j_next = [y_j + (k1 + 2.0 * k2 + 2.0 * k3 + k4) * step_size / 6.0 for y_j, k1, k2, k3, k4 in zip(y_i_j, K1, K2, K3, K4)]
+        return y_i_j_next
+
+    def solve(self, initial: list[float], step_size: float, interval: Tuple[float, float] = (0.0, 1.0)) -> list[np.ndarray]:
+        self.check(initial, step_size, interval)
+        start, end = interval
+
+        xs = np.arange(start, end + step_size, step_size)
+        xs[-1] = end
+        ys = []
+        for init in initial:
+            y = np.zeros_like(xs)
+            y[0] = init
+            ys.append(y)
+
+        for j in range(xs.shape[0] - 1):
+            y_i_j = [y_i[j] for y_i in ys]
+            y_i_j_next = self.rk4(step_size, y_i_j)
 
             for y_i, y_i_j1 in zip(ys, y_i_j_next):
                 y_i[j + 1] = y_i_j1
 
         return ys
-
-class RungeKuttaSystem(SystemSolver):
-    def solve(self, initial: list[float], step_size: float, interval: Tuple[float, float] = (0.0, 1.0)) -> list[np.ndarray]:
-        pass

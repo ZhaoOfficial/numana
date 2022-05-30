@@ -4,19 +4,13 @@ import matplotlib.pyplot as plt
 import ode
 
 plt.rcParams['font.family'] = ["Georgia"]
-plt.rcParams['font.size'] = 20.0
+plt.rcParams['font.size'] = 24.0
 
-class Test1(object):
-    def __init__(self):
-        self.initial = 100.0
-        self.interval = (0.0, 1.0)
-        self.solution = lambda x: self.initial * np.exp(-50 * x)
-
+class Test(object):
     def draw(self, xs: np.ndarray, ys: np.ndarray, title: str, filename: str):
-        ys_real = self.solution(xs)
-        plt.figure(figsize=(8, 6))
-        plt.plot(xs, ys, label="Numerical")
-        plt.plot(xs, ys_real, label="Symbolic")
+        plt.figure(figsize=(10, 8))
+        plt.plot(xs, ys, label="Numerical", color="orange")
+        plt.plot(self.x_real, self.y_real, label="Symbolic", color="purple")
         plt.xlabel("$x$")
         plt.ylabel("$y$")
         plt.title(title)
@@ -24,6 +18,14 @@ class Test1(object):
         plt.tight_layout()
         # plt.show()
         plt.savefig(filename)
+        plt.close()
+
+class Test1(Test):
+    def __init__(self):
+        self.initial = 100.0
+        self.interval = (0.0, 1.0)
+        self.x_real = np.linspace(*self.interval, 100)
+        self.y_real = self.initial * np.exp(-50 * np.linspace(*self.interval, 100))
 
     def problem1(self):
         print("\033\13331mUsing Explicit Euler's Methods...\033\1330m")
@@ -61,24 +63,12 @@ class Test1(object):
                 r"lab2\figure\Q12_h_{:.2f}.png".format(step_size)
             )
 
-class Test2(object):
+class Test2(Test):
     def __init__(self):
         self.initial = [3.0, 2.0]
         self.interval = (0.0, 4 * np.pi)
         self.x_real = np.cos(np.linspace(0.0, 2.0 * np.pi, 100)) * (3 * np.sqrt(2))
         self.y_real = np.sin(np.linspace(0.0, 2.0 * np.pi, 100)) * (2 * np.sqrt(2))
-
-    def draw(self, xs: np.ndarray, ys: np.ndarray, title: str, filename: str):
-        plt.figure(figsize=(10, 8))
-        plt.plot(xs, ys, label="Numerical")
-        plt.plot(self.x_real, self.y_real, label="Symbolic")
-        plt.xlabel("$x$")
-        plt.ylabel("$y$")
-        plt.title(title)
-        plt.legend()
-        plt.tight_layout()
-        # plt.show()
-        plt.savefig(filename)
 
     def problem1(self):
         print("\033\13331mUsing Trapezoid Euler's Methods...\033\1330m")
@@ -140,25 +130,83 @@ class Test2(object):
                 r"lab2\figure\Q24_rk4_h_{:.3f}.png".format(h)
             )
 
-class Test3(object):
+class Test3(Test):
     def __init__(self):
-        pass
-
-    def draw(self, xs, ys,):
-        pass
+        self.initial = [np.pi / 3, -0.5]
+        self.interval = [0.0, 10.0]
 
     def problem1(self):
-        pass
+        print("\033\13331mUsing Implicit Euler's Methods...\033\1330m")
+        print("\033\13331mUsing Trapezoid Euler's Methods...\033\1330m")
+        h = 0.02
+        solver1 = ode.ImplicitEulerSystem(
+            lambda y1, y2: y2,
+            lambda y1, y2: -np.sin(y1),
+        )
+        solver2 = ode.TrapezoidEulerSystem(
+            lambda y1, y2: y2,
+            lambda y1, y2: -np.sin(y1),
+        )
+
+        yi1, yi2 = solver1.iterativeSolve(self.initial, h, self.interval)
+        yt1, yt2 = solver2.iterativeSolve(self.initial, h, self.interval)
+        xs = np.linspace(*self.interval, yi1.shape[0])
+        plt.figure(figsize=(10, 8))
+        plt.plot(xs, yi1, label="Implicit", color="orange")
+        plt.plot(xs, yt1, label="Trapezoid", color="purple")
+        plt.xlabel("$x$")
+        plt.ylabel("$y$")
+        plt.title(r"Different Methods with $h={:.2f}$".format(h))
+        plt.legend()
+        plt.tight_layout()
+        plt.savefig(r"lab2\figure\Q31_h_{:.2f}.png".format(h))
+        plt.close()
+
+    def problem2(self):
+        print("\033\13331mUsing Implicit Euler's Methods...\033\1330m")
+        print("\033\13331mUsing Trapezoid Euler's Methods...\033\1330m")
+        h = 0.02
+        solver1 = ode.ImplicitEulerSystem(
+            lambda y1, y2: y2,
+            lambda y1, y2: -np.sin(y1),
+        )
+        solver2 = ode.TrapezoidEulerSystem(
+            lambda y1, y2: y2,
+            lambda y1, y2: -np.sin(y1),
+        )
+        solver3 = ode.RungeKuttaSystem(
+            lambda y1, y2: y2,
+            lambda y1, y2: -np.sin(y1),
+        )
+        yi1, yi2 = solver1.iterativeSolve(self.initial, h, self.interval)
+        yt1, yt2 = solver2.iterativeSolve(self.initial, h, self.interval)
+        yr1, yr2 = solver3.solve(self.initial, h, self.interval)
+        xs = np.linspace(*self.interval, yi1.shape[0])
+        plt.figure(figsize=(10, 8))
+        plt.plot(xs, yi1, label="Implicit", color="orange")
+        plt.plot(xs, yt1, label="Trapezoid", color="purple")
+        plt.plot(xs, yr1, label="RK4", color="pink")
+        plt.xlabel("$x$")
+        plt.ylabel("$y$")
+        plt.title(r"Different Methods with $h={:.2f}$".format(h))
+        plt.legend()
+        plt.tight_layout()
+        plt.savefig(r"lab2\figure\Q32_h_{:.2f}.png".format(h))
+        plt.close()
 
 if __name__ == "__main__":
 
-    # test1 = Test1()
-    # test1.problem1()
-    # test1.problem2()
-    # test1.problem3()
+    test1 = Test1()
+    test1.problem1()
+    test1.problem2()
+    test1.problem3()
 
     test2 = Test2()
-    # test2.problem1()
-    # test2.problem2()
-    # test2.problem3()
+    test2.problem1()
+    test2.problem2()
+    test2.problem3()
     test2.problem4()
+
+    test3 = Test3()
+    test3.problem1()
+    test3.problem2()

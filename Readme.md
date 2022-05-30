@@ -2,7 +2,7 @@
 
 Code for Numerical Analysis.
 
-## Process Bar
+## Check List
 
 ### Chapter 0 Fundamentals
 

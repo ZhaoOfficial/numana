@@ -369,7 +369,23 @@
 
 \subsubsection{四阶 Runge-Kutta 法}
 四阶 Runge-Kutta 分析过于复杂，这里只给出最终的结果。
-
+\begin{figure*}[h]
+    \begin{subfigure}[h]{0.3\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figure/Q24_rk4_h_0.001.png}
+    \end{subfigure}
+    \begin{subfigure}[h]{0.3\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figure/Q24_rk4_h_0.010.png}
+    \end{subfigure}
+    \begin{subfigure}[h]{0.3\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figure/Q24_rk4_h_0.100.png}
+    \end{subfigure}
+    \caption{四阶 Runge-Kutta 法得到的轨迹，几乎与精确解重合。}
+    \label{fig:Runge-Kutta}
+\end{figure*}
+    
 \subsection{试验三}
 改写
 \begin{equation*}
@@ -384,6 +400,10 @@
         y_2'=y_3\\
         y_3=-\sin y_1\\
         y_1(0)=\dfrac{\pi}{3},y_2(0)=-\dfrac{1}{2}
+    \end{cases}\Rightarrow
+    \begin{cases}
+        y_1'=y_2\\
+        y_2'=-\sin y_1\\
     \end{cases}
 \end{equation*}
 
@@ -403,6 +423,24 @@
     \end{aligned}
 \end{equation*}
 
+这里我们仍然可以沿用之前的代码。
+
+\subsubsection{结果}
+\begin{figure*}[h]
+    \centering
+    \begin{subfigure}[h]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figure/Q31_h_0.02.png}
+    \end{subfigure}
+    \centering
+    \begin{subfigure}[h]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figure/Q32_h_0.02.png}
+    \end{subfigure}
+    \caption{用隐式欧拉法和梯形法对高阶常微分方程进行求解得到的图像。用四阶 Runge-Kutta 法进行验证（右）。}
+    \label{fig:system}
+\end{figure*}
+
 
 \section{分析和总结}
 \subsection{试验一}
@@ -418,14 +456,15 @@
 试验二中，我们分别用梯形法、Euler 法，四阶 Runge-Kutta 法求解同一个常微分方程组。
 有如下发现：
 \begin{enumerate}
-    \item
+    \item 欧拉法无法保证相平面中的轨迹不偏移，且可以发现，显式欧拉法解得的轨迹偏向于向外偏移；隐式欧拉法解得的轨迹偏向于向内偏移。见图\ref{fig:phase-plane}。
+    \item 梯形法和四阶 Runge-Kutta 法在步长足够小的时候可以使得轨迹维持在相平面上；在步长较大时候因为数值误差仍然会偏移。但 Runge-Kutta 法收敛性比梯形法好很多。见图\ref{fig:phase-plane}、图\ref{fig:Runge-Kutta}。
 \end{enumerate}
 
 \subsection{试验三}
 试验三中，我们分别用隐式欧拉公式和梯形公式求解求解同一个常微分方程组，步长为 $0.02$。
 有如下发现：
 \begin{enumerate}
-    \item
+    \item 由于隐式欧拉法是一阶方法，收敛的速度不如二阶的梯形法。因此在与四阶 Runge-Kutta 法进行比较时候，可以发现梯形法已经收敛，但隐式欧拉法仍未。见图\ref{fig:system}。
 \end{enumerate}
 
 \section{程序}
